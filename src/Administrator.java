@@ -1,8 +1,6 @@
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class Administrator {
     private String name;
@@ -14,16 +12,26 @@ public class Administrator {
             if (re.getRequest().equals("buy")) this.buy(re);
             else this.put(re);
         }
+        request_lite.request_lite.clear();
     }
     public void put(request request){
-        WareHouse.warehouse.put(request.getP().getId() , request.getP());
-        if (!WareHouse.reverse.containsKey(request.getP().getName())|| WareHouse.reverse.get(request.getP().getName()).isEmpty()){
-            WareHouse.reverse.put(request.getP().getName() , new ArrayList<>(Arrays.asList(request.getP())));
-        }else WareHouse.reverse.compute(request.getP().getName() , (k ,v) -> {v.add(request.getP());return v;});
-        request_lite.request_lite.remove(request);
+        product p = request.getP();
+        WareHouse.warehouse.put(p.getId() , p);
+        if (!WareHouse.reverse.containsKey(p.getName())|| WareHouse.reverse.get(p.getName()).isEmpty()){
+            WareHouse.reverse.put(p.getName() , new ArrayList<>(Arrays.asList(p)));
+        }else WareHouse.reverse.compute(p.getName() , (k ,v) -> {v.add(p);return v;});
     }
     public void buy(request request){
-        if (WareHouse.warehouse.containsKey(request.getP().getId())){WareHouse.warehouse.remove(request.getP().getId());}
-        else {System.out.println("没有找到该商品");}
+        product p = request.getP();
+        if (WareHouse.warehouse.containsKey(p.getId())){
+            WareHouse.warehouse.remove(p.getId());
+            Iterator<product> iterator = WareHouse.reverse.get(p.getName()).iterator();
+            while (iterator.hasNext()){
+                product data = iterator.next();
+                if (data.equals(p)) iterator.remove();
+            }
+            System.out.println(p.getName()+"被成功拍下");
+        }
+        else {System.out.println("没有找到该商品或者该商品已经被他人拍走。");}
     }
 }

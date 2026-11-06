@@ -1,5 +1,4 @@
 import java.io.*;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,14 +13,17 @@ public class User {
         request Re = request.creat(buy_put.B.action , p);
         request_lite.request_lite.add(Re);
     }
-    public void buy(product p){
+    public void buy(int id){
+        if (!WareHouse.warehouse.containsKey(id)) {
+            System.out.println("该商品不存在");return;}
+        product p = WareHouse.warehouse.get(id);
         request Re = request.creat(buy_put.A.action , p);
         request_lite.request_lite.add(Re);
 }
     public void check(String name){
         if (WareHouse.reverse.containsKey(name)){
             List<product> lite = WareHouse.reverse.get(name);
-            if (lite.isEmpty()){System.out.println("没有相关商品");}
+            if (lite.isEmpty()){System.out.println("没有相关商品");return;}
             String print = lite.stream()
                     .map(p -> "(" + p.getId() + ", "+p.getName()+", "+ p.getPrice() + ")")
                     .collect(Collectors.joining(", "));
